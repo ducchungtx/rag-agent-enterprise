@@ -1,39 +1,29 @@
-# 03 — Checklist trước demo / thử nghiệm nội bộ
+# 03 — Checklist MVP
 
-## Chức năng
+- [x] Register tạo personal tenant (Owner)
+- [x] JWT + `X-Tenant-Id`
+- [x] KB CRUD theo tenant
+- [x] Upload md/txt/pdf → chunks + embedding
+- [x] Search filter `tenant_id` + `kb_id`
+- [x] Chat có `citations[]`
+- [x] Agent tools `search_knowledge` + `read_document` + SSE
+- [x] RBAC 4 cấp (Viewer không upload)
+- [x] Invite + đổi role
+- [x] API Key capabilities tách khỏi role
+- [x] Audit log
+- [x] Request ID middleware
+- [x] Redis RQ ingest (bật `USE_ASYNC_INGEST`)
+- [x] docker-compose (postgres, redis, api, worker)
+- [x] Blueprint domain Pháp chế / Luật Đất đai
 
-- [ ] Đăng ký / đăng nhập / refresh  
-- [ ] Tạo workspace, mời user, đổi role  
-- [ ] CRUD KB đúng quyền  
-- [ ] Upload → completed → search hit  
-- [ ] Chat có citation  
-- [ ] Agent gọi tool, không vượt max_steps  
-- [ ] API Key theo capability  
+## Phase 6 — Domain Pháp chế (bước tiếp theo)
 
-## Bảo mật
+- [ ] Corpus trong `data/docs/` (lab `.md`; `.doc` convert trước khi upload)
+- [ ] `make demo-phap-che` pass — xem [04-demo-kich-ban.md](./04-demo-kich-ban.md)
+- [ ] Demo tay 2 câu hỏi Luật Đất đai có citation trên Swagger
 
-- [ ] Cross-tenant IDOR tests xanh  
-- [ ] Viewer bị chặn ingest  
-- [ ] Không log secret  
-- [ ] Rate limit login  
+## Tự kiểm nhanh
 
-## Vận hành
-
-- [ ] `docker compose up` documented  
-- [ ] Backup Postgres thử restore 1 lần  
-- [ ] Healthcheck + migrate  
-
-## Quan sát
-
-- [ ] Có `request_id` trên response/error  
-- [ ] Job fail nhìn thấy được (status/UI/log)  
-
-## Tài liệu giao cho đồng nghiệp
-
-- [ ] README chạy local  
-- [ ] Ma trận role 1 trang  
-- [ ] 5 câu hỏi mẫu + tài liệu nguồn  
-
----
-
-Khi checklist đủ: bạn đã có **nền** để mở rộng theo hướng WeKnora (Wiki, MCP, sandbox…) một cách có chủ đích — không copy mù.
+1. Viewer upload → 403?  
+2. Tenant khác chat KB → 404?  
+3. API Key `retrieve` gọi `/chat` → 403?  

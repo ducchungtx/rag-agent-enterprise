@@ -2,7 +2,7 @@
 
 Tài liệu học **không** thay docs chính thức. Dùng bảng này như mục lục “soi code mẫu”.
 
-Root WeKnora: `E:\Projects\learning\AI\WeKnora`
+Root WeKnora: `/Users/mac/Desktop/Projects/Learn/AI/WeKnora`
 
 ## Đọc theo phase
 
@@ -85,9 +85,11 @@ WeKnora **không** map API Key = role Owner. Học đúng điểm này ở Phase
 
 ## Bài tập Phase 0 (15 phút)
 
-1. Mở `website-docs/02-architecture/01-overview.md` — liệt kê 5 service core.  
-2. Mở `website-docs/03-features/01-tenant-auth.md` — viết lại bằng tiếng Việt 4 role.  
+1. Đọc bản Việt: [`weknora-vi/01-overview.vi.md`](./weknora-vi/01-overview.vi.md) — liệt kê 5 service core.  
+2. Đọc bản Việt: [`weknora-vi/01-tenant-auth.vi.md`](./weknora-vi/01-tenant-auth.vi.md) — viết lại 4 role.  
 3. Trả lời: *Tại sao Viewer không được upload?* (1–2 câu).
+
+Nguồn gốc (tiếng Trung): `website-docs/02-architecture/01-overview.md`, `website-docs/03-features/01-tenant-auth.md`.
 
 ## Liên kết tiếp
 

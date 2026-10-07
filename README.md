@@ -2,7 +2,21 @@
 
 Học kiến trúc và xây **Agent AI doanh nghiệp có phân quyền**, lấy [WeKnora](../WeKnora) làm mẫu tham chiếu thực tế.
 
-> Repo này hiện là **lộ trình học + blueprint**. Code sẽ được thêm dần theo từng lab trong `docs/`.
+> Repo gồm **lộ trình học (`docs/`)** + **MVP code (`app/`)** — Python/FastAPI, PostgreSQL+pgvector, Redis RQ.
+
+## Chạy nhanh MVP
+
+```bash
+cp .env.example .env
+docker compose up -d postgres redis
+uv sync --all-extras
+uv run python -m app.bootstrap_db
+uv run uvicorn app.main:app --reload --port 8000
+# smoke: make smoke-rag && make smoke-rbac
+# Phase 6 demo: make demo-phap-che
+```
+
+Chi tiết API: [`app/README.md`](./app/README.md) · Swagger: http://127.0.0.1:8000/docs
 
 ## Mục tiêu
 
@@ -49,7 +63,7 @@ Sau khi đi hết lộ trình, bạn có thể tự thiết kế và implement m
 | Hàng đợi | Asynq + Redis | document process workers |
 | CLI / MCP | `cli/`, MCP built-in | `cli/AGENTS.md` |
 
-Đường dẫn WeKnora trên máy bạn: `E:\Projects\learning\AI\WeKnora`.
+Đường dẫn WeKnora trên máy bạn: `/Users/mac/Desktop/Projects/Learn/AI/WeKnora`.
 
 ## Cấu trúc thư mục tài liệu
 
@@ -70,7 +84,7 @@ Mỗi phase có bài lý thuyết + **lab** (bài tập thực hành). Làm lab 
 
 | Lớp | Gợi ý | Ghi chú |
 |-----|-------|---------|
-| Backend | Go (Gin) *hoặc* Python (FastAPI) | WeKnora dùng Go; chọn 1 và giữ đến hết lộ trình |
+| Backend | **Python (FastAPI)** (đã chọn) | Học ý tưởng từ WeKnora Go; lab code trong `app/` |
 | Frontend | Vue 3 hoặc Next.js (tùy bạn) | Phase 1–4 có thể chỉ API + curl |
 | DB | PostgreSQL + pgvector | Đủ cho BM25/fulltext + vector |
 | Queue | Redis + Asynq (Go) / RQ/Celery (Py) | Phase 5 mới bắt buộc |
