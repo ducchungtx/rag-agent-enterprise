@@ -106,9 +106,12 @@ CHAT_MODEL=mistral-medium-latest
 ```
 
 ```bash
-make db
+make db-reset        # DROP + tạo lại vector(1024) — mất data lab cũ
+# restart API (uvicorn --reload hoặc make run)
 make demo-phap-che   # hoặc upload lại corpus
 ```
+
+Embed gọi theo batch 32 + nghỉ ~1s (RPS≈1). File lớn sẽ ingest lâu hơn `fake`.
 
 ## Kiểm tra nhanh
 

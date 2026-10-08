@@ -12,6 +12,9 @@ down:
 db:
 	uv run python -m app.bootstrap_db
 
+db-reset:
+	uv run python -m app.bootstrap_db --reset
+
 run:
 	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 

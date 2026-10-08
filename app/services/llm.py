@@ -1,22 +1,31 @@
 """Embedding + chat providers. fake = offline deterministic for labs.
 
 OpenAI-compatible backends (Ollama, Mistral, …) share the same HTTP paths:
-  POST {LLM_BASE_URL}/chat/completions
-  POST {LLM_BASE_URL}/embeddings
+  POST {base}/chat/completions
+  POST {base}/embeddings
 
-Mistral: LLM_BASE_URL=https://api.mistral.ai/v1 — see docs/01-nen-tang/05-cau-hinh-mistral.md
+Mistral: see docs/01-nen-tang/05-cau-hinh-mistral.md
 """
 
 from __future__ import annotations
 
 import hashlib
+import logging
 import math
 import re
+import time
 from typing import Any
 
 import httpx
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
+# Mistral embed account often has RPS≈1 — keep batches small + pause between calls.
+_EMBED_BATCH_SIZE = 32
+_EMBED_MIN_INTERVAL_S = 1.05
+_EMBED_MAX_RETRIES = 5
 
 
 class LLMError(RuntimeError):
@@ -54,16 +63,71 @@ def embed_query(text: str) -> list[float]:
 
 
 def _openai_embed(texts: list[str]) -> list[list[float]]:
+    if not texts:
+        return []
     provider = settings.embedding_provider
     url = f"{settings.resolved_llm_base_url(provider).rstrip('/')}/embeddings"
     headers = {"Authorization": f"Bearer {settings.resolved_llm_api_key(provider)}"}
-    payload = {"model": settings.embedding_model, "input": texts}
-    with httpx.Client(timeout=60.0) as client:
+    out: list[list[float]] = []
+    last_call = 0.0
+    with httpx.Client(timeout=120.0) as client:
+        for i in range(0, len(texts), _EMBED_BATCH_SIZE):
+            batch = texts[i : i + _EMBED_BATCH_SIZE]
+            # Respect RPS≈1 for mistral-embed
+            elapsed = time.monotonic() - last_call
+            if last_call and elapsed < _EMBED_MIN_INTERVAL_S:
+                time.sleep(_EMBED_MIN_INTERVAL_S - elapsed)
+            vectors = _embed_batch_with_retry(client, url, headers, batch, provider)
+            last_call = time.monotonic()
+            out.extend(vectors)
+            logger.info(
+                "Embedded batch %s-%s / %s (provider=%s model=%s)",
+                i + 1,
+                i + len(batch),
+                len(texts),
+                provider,
+                settings.embedding_model,
+            )
+    return out
+
+
+def _embed_batch_with_retry(
+    client: httpx.Client,
+    url: str,
+    headers: dict[str, str],
+    batch: list[str],
+    provider: str,
+) -> list[list[float]]:
+    payload = {"model": settings.embedding_model, "input": batch}
+    delay = _EMBED_MIN_INTERVAL_S
+    for attempt in range(1, _EMBED_MAX_RETRIES + 1):
         resp = client.post(url, json=payload, headers=headers)
-        resp.raise_for_status()
+        if resp.status_code == 429:
+            logger.warning("Embed 429 attempt %s/%s — sleep %.1fs", attempt, _EMBED_MAX_RETRIES, delay)
+            time.sleep(delay)
+            delay = min(delay * 2, 16.0)
+            continue
+        if resp.status_code >= 400:
+            raise LLMError(
+                f"Embed error {resp.status_code} provider={provider} "
+                f"model={settings.embedding_model}: {resp.text[:300]}",
+                status_code=resp.status_code,
+            )
         data = resp.json()["data"]
         data = sorted(data, key=lambda x: x["index"])
-        return [row["embedding"] for row in data]
+        vectors = [row["embedding"] for row in data]
+        if vectors and len(vectors[0]) != settings.embedding_dim:
+            raise LLMError(
+                f"Embedding dim mismatch: got {len(vectors[0])} expected {settings.embedding_dim}. "
+                "Set EMBEDDING_DIM cho khớp model rồi make db --reset.",
+                status_code=None,
+            )
+        return vectors
+    raise LLMError(
+        f"Embed rate limit (429) sau {_EMBED_MAX_RETRIES} lần — provider={provider} "
+        f"model={settings.embedding_model}",
+        status_code=429,
+    )
 
 
 def chat_completion(system: str, user: str, context_blocks: list[str] | None = None) -> str:
@@ -82,7 +146,6 @@ def _fake_chat(question: str, contexts: list[str]) -> str:
         scored.append((overlap, ctx))
     scored.sort(key=lambda x: x[0], reverse=True)
     best = scored[0][1]
-    # Extract a short factual sentence if possible
     sentences = re.split(r"(?<=[.!?。])\s+|\n+", best)
     pick = sentences[0] if sentences else best
     for s in sentences:
