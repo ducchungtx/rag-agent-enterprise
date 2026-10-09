@@ -1,4 +1,4 @@
-# Cấu hình Mistral AI (chat / embed)
+# Cấu hình Mistral / Gemini (chat / embed)
 
 Repo này **giữ pipeline RAG riêng** (ingest → pgvector → citation). Mistral chỉ thay lớp **LLM** (và tuỳ chọn embedding).
 
@@ -33,8 +33,8 @@ Không dùng cho chat RAG: `codestral-2508` (code), `mistral-moderation-2603`, c
 | `mistral-embed-2312` | 20M | 1.0 | **1024** | **Khuyến nghị** khi bật embed Mistral |
 | `codestral-embed` | 50k | 1.0 | (code) | Không phù hợp corpus luật |
 
-Cách A (lab nhanh): giữ `EMBEDDING_PROVIDER=fake` — không đụng dim DB.  
-Cách B: `EMBEDDING_MODEL=mistral-embed-2312` + `EMBEDDING_DIM=1024` + `make db` + re-ingest.
+Cách A (lab offline): `EMBEDDING_PROVIDER=fake` — không đụng dim DB.  
+Cách B (**đang dùng trên máy lab**): `mistral-embed-2312` + `EMBEDDING_DIM=1024` + `make db-reset` + re-ingest.
 
 ## Nhiều provider (Mistral + Gemini)
 
@@ -44,9 +44,12 @@ Giữ **cả hai key** trong `.env`. Base URL tự chọn theo `CHAT_PROVIDER` (
 MISTRAL_API_KEY=...
 GEMINI_API_KEY=...
 
-# Đang dùng Mistral:
+# Lab hiện tại (tránh 429 Medium):
 CHAT_PROVIDER=mistral
-CHAT_MODEL=mistral-medium-latest
+CHAT_MODEL=ministral-8b-2512
+EMBEDDING_PROVIDER=mistral
+EMBEDDING_DIM=1024
+EMBEDDING_MODEL=mistral-embed-2312
 
 # Đổi sang Gemini (restart API) — catalog: https://ai.google.dev/gemini-api/docs/models
 # CHAT_PROVIDER=gemini
@@ -80,38 +83,37 @@ Nguồn: [Gemini API Models](https://ai.google.dev/gemini-api/docs/models) (cậ
 
 Khi bật: `EMBEDDING_PROVIDER=gemini` + kiểm tra dim vector thực tế rồi set `EMBEDDING_DIM` + `make db` + re-ingest.
 
-## Cách A — Chat Mistral (khuyến nghị bắt đầu)
+## Cách A — Chỉ chat Mistral, embed `fake` (bắt đầu nhanh)
 
 ```bash
 CHAT_PROVIDER=mistral
 EMBEDDING_PROVIDER=fake
 EMBEDDING_DIM=384
 MISTRAL_API_KEY=sk-...
-CHAT_MODEL=mistral-medium-latest
-# hoặc: ministral-8b-2512 | mistral-small-2603 | mistral-large-2512
+CHAT_MODEL=ministral-8b-2512
+# Medium: mistral-medium-latest (dễ 429 — RPS 1)
 ```
 
 Restart API (`make run`). Không cần re-ingest.
 
-## Cách B — Embed `mistral-embed-2312`
+## Cách B — Embed `mistral-embed-2312` (khuyến nghị sau khi chat ổn)
 
 ```bash
 EMBEDDING_PROVIDER=mistral
 EMBEDDING_DIM=1024
 EMBEDDING_MODEL=mistral-embed-2312
 CHAT_PROVIDER=mistral
-LLM_BASE_URL=https://api.mistral.ai/v1
 MISTRAL_API_KEY=sk-...
-CHAT_MODEL=mistral-medium-latest
+CHAT_MODEL=ministral-8b-2512
 ```
 
 ```bash
 make db-reset        # DROP + tạo lại vector(1024) — mất data lab cũ
-# restart API (uvicorn --reload hoặc make run)
-make demo-phap-che   # hoặc upload lại corpus
+# restart API (make run)
+# upload lại corpus hoặc make demo-phap-che
 ```
 
-Embed gọi theo batch 32 + nghỉ ~1s (RPS≈1). File lớn sẽ ingest lâu hơn `fake`.
+Embed: batch **32** + nghỉ ~**1s** + retry 429 (RPS≈1). File `converted/*.txt` lớn ingest chậm hơn `fake`.
 
 ## Kiểm tra nhanh
 

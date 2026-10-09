@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api import api_router
 from app.core.config import settings
@@ -9,6 +12,8 @@ from app.core.logging import setup_logging
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.request_id import RequestIdMiddleware
 from app.models.schemas import HealthOut
+
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 
 @asynccontextmanager
@@ -41,6 +46,17 @@ def create_app() -> FastAPI:
     @application.get("/health", response_model=HealthOut, tags=["system"])
     def health() -> HealthOut:
         return HealthOut(ok=True, service=settings.app_name)
+
+    @application.get("/ui", include_in_schema=False)
+    def ui_root() -> RedirectResponse:
+        return RedirectResponse(url="/ui/")
+
+    if WEB_DIR.is_dir():
+        application.mount(
+            "/ui",
+            StaticFiles(directory=str(WEB_DIR), html=True),
+            name="ui",
+        )
 
     return application
 

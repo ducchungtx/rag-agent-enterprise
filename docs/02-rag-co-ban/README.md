@@ -7,3 +7,5 @@
 5. [05 — Lab: Mini RAG](./05-lab-mini-rag.md)
 
 **Xong Phase 2 khi:** upload `.md` → search được → chat trả lời kèm nguồn.
+
+> Sau lab: KB còn thiếu lớp domain / gate / multi-KB để dùng thật ở DN — xem [../06-xay-du-an/05-kb-vuot-demo.md](../06-xay-du-an/05-kb-vuot-demo.md).

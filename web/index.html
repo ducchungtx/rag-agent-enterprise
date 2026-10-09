@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>rag-agent-enterprise — UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ui/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">rae</span>
+        <div>
+          <strong>rag-agent-enterprise</strong>
+          <p>UI tối thiểu · Pháp chế / Luật Đất đai</p>
+        </div>
+      </div>
+      <div class="topbar-meta" id="session-meta" hidden>
+        <span id="user-label"></span>
+        <button type="button" class="btn ghost" id="btn-logout">Đăng xuất</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Auth -->
+      <section class="panel" id="view-auth">
+        <h1>Đăng nhập / Đăng ký</h1>
+        <p class="lede">JWT lưu localStorage; mọi request nghiệp vụ kèm <code>X-Tenant-Id</code>.</p>
+        <form id="form-auth" class="stack">
+          <label>Email <input type="email" name="email" required autocomplete="username" /></label>
+          <label>Username (đăng ký) <input type="text" name="username" minlength="2" autocomplete="nickname" /></label>
+          <label>Password <input type="password" name="password" required minlength="8" autocomplete="current-password" /></label>
+          <div class="row">
+            <button type="submit" class="btn primary" data-mode="login">Đăng nhập</button>
+            <button type="submit" class="btn" data-mode="register">Đăng ký</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Workspace -->
+      <section class="panel" id="view-workspace" hidden>
+        <h1>Workspace</h1>
+        <p class="lede">Chọn tenant có sẵn (tự load KB cũ) hoặc tạo mới nếu chưa có.</p>
+        <div class="row wrap">
+          <label class="grow">Tenant
+            <select id="tenant-select"></select>
+          </label>
+        </div>
+        <form id="form-tenant" class="stack inline">
+          <label class="grow">Tên tenant mới <input type="text" name="name" minlength="2" placeholder="Phòng Pháp chế" /></label>
+          <button type="submit" class="btn">Tạo tenant</button>
+        </form>
+      </section>
+
+      <!-- Knowledge -->
+      <section class="panel" id="view-kb" hidden>
+        <h1>Knowledge Base</h1>
+        <p class="lede">Chọn KB đã ingest trước đó để chat ngay. Chỉ tạo/upload khi cần thêm tài liệu.</p>
+        <div class="row wrap">
+          <label class="grow">KB đang chọn
+            <select id="kb-select"></select>
+          </label>
+        </div>
+        <p class="hint" id="kb-hint" hidden></p>
+        <details class="more">
+          <summary>Thêm KB / upload tài liệu</summary>
+          <form id="form-kb" class="stack inline">
+            <label class="grow">Tên KB mới <input type="text" name="name" placeholder="Luật Đất đai + Policy" /></label>
+            <button type="submit" class="btn">Tạo KB</button>
+          </form>
+          <form id="form-upload" class="stack inline">
+            <label class="grow">File <input type="file" name="file" accept=".md,.txt,.pdf" /></label>
+            <button type="submit" class="btn primary">Upload</button>
+          </form>
+          <ul class="log" id="upload-log"></ul>
+        </details>
+      </section>
+
+      <!-- Chat -->
+      <section class="panel" id="view-chat" hidden>
+        <h1>Chat / Agent</h1>
+        <p class="lede" id="chat-lede">Chat với KB đang chọn (dữ liệu đã ingest). Agent dùng SSE.</p>
+        <form id="form-chat" class="stack">
+          <label>Câu hỏi
+            <textarea name="question" rows="3" required placeholder="Thời hạn sử dụng đất nông nghiệp của cá nhân trực tiếp sản xuất là bao lâu?"></textarea>
+          </label>
+          <div class="row">
+            <button type="submit" class="btn primary" data-mode="chat" id="btn-chat">Chat</button>
+            <button type="submit" class="btn" data-mode="agent" id="btn-agent">Agent (SSE)</button>
+          </div>
+        </form>
+        <div class="answer-box" id="answer-box" hidden>
+          <h2>Trả lời</h2>
+          <pre id="answer-text"></pre>
+          <h2>Citations / Events</h2>
+          <ul class="citations" id="citations"></ul>
+        </div>
+      </section>
+    </main>
+
+    <aside class="status" id="status" aria-live="polite"></aside>
+  </div>
+  <script src="/ui/app.js"></script>
+</body>
+</html>

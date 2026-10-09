@@ -9,11 +9,11 @@ FastAPI MVP: Auth → Tenant/RBAC → KB ingest → hybrid search → chat citat
 cp .env.example .env
 docker compose up -d postgres redis
 uv sync --all-extras
-uv run python -m app.bootstrap_db
+uv run python -m app.bootstrap_db   # hoặc: make db-reset khi đổi EMBEDDING_DIM
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-Swagger: http://127.0.0.1:8000/docs
+Swagger: http://127.0.0.1:8000/docs · UI tối thiểu: http://127.0.0.1:8000/ui
 
 ## Headers quan trọng
 
@@ -23,26 +23,29 @@ Swagger: http://127.0.0.1:8000/docs
 | `X-Tenant-Id: <uuid>` | Chọn workspace (JWT) |
 | `X-API-Key: rae_...` | Máy gọi API (không cần JWT) |
 
-## Smoke
+## Smoke / demo
 
 ```bash
 make smoke-rag
 make smoke-rbac
+make demo-phap-che
 ```
 
-`EMBEDDING_PROVIDER=fake` và `CHAT_PROVIDER=fake` mặc định — không cần Ollama để lab.
+Lab offline: `EMBEDDING_PROVIDER=fake` + `CHAT_PROVIDER=fake`.
 
-### Mistral AI (chat)
+### Mistral / Gemini (lab hiện tại)
 
-Giữ RAG/pgvector trong repo; chỉ đổi LLM sang Mistral (OpenAI-compatible). Chi tiết: [`docs/01-nen-tang/05-cau-hinh-mistral.md`](../docs/01-nen-tang/05-cau-hinh-mistral.md).
+Chi tiết model + quota: [`docs/01-nen-tang/05-cau-hinh-mistral.md`](../docs/01-nen-tang/05-cau-hinh-mistral.md).
 
 ```bash
-# trong .env — xem quota account trong docs/01-nen-tang/05-cau-hinh-mistral.md
+# .env — cấu hình đã chạy ổn trên máy lab
 CHAT_PROVIDER=mistral
-EMBEDDING_PROVIDER=fake
-LLM_BASE_URL=https://api.mistral.ai/v1
-MISTRAL_API_KEY=sk-...
-CHAT_MODEL=mistral-medium-latest   # hoặc ministral-8b-2512 / mistral-large-2512
-# Gemini: CHAT_PROVIDER=gemini  CHAT_MODEL=gemini-3.8-flash
-# embed sau: EMBEDDING_MODEL=mistral-embed-2312 + EMBEDDING_DIM=1024
+CHAT_MODEL=ministral-8b-2512
+EMBEDDING_PROVIDER=mistral
+EMBEDDING_DIM=1024
+EMBEDDING_MODEL=mistral-embed-2312
+MISTRAL_API_KEY=...
+# GEMINI_API_KEY=...   # tuỳ chọn; đổi CHAT_PROVIDER=gemini + CHAT_MODEL=gemini-3.8-flash
 ```
+
+Đổi dim embed → `make db-reset` + restart API + ingest lại.

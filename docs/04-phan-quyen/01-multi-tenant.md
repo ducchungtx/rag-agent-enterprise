@@ -44,6 +44,11 @@ Mọi request nghiệp vụ:
 WeKnora: nhiều tenant trong một Organization để **share** KB.  
 MVP: chưa cần org — chỉ RBAC trong 1 tenant + chưa share cross-tenant.
 
+## KB trong tenant — vượt “túi file”
+
+Isolation theo `tenant_id` (+ `kb_id`) là **điều kiện cần**, chưa đủ cho DN: vẫn có thể hỏi đúng workspace nhưng **sai miền KB**.  
+Phân tích + phương án: [../06-xay-du-an/05-kb-vuot-demo.md](../06-xay-du-an/05-kb-vuot-demo.md).
+
 ## Tiếp
 
 → [02 — RBAC 4 cấp](./02-rbac-4-cap.md)

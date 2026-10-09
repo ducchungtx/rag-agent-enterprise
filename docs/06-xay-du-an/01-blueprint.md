@@ -22,19 +22,23 @@
 
 **Gạch (chưa làm):** Wiki, GraphRAG, sandbox/skills, IM, OIDC, UI đầy đủ.
 
+**Gap DN (KB):** MVP = 1 `kb_id` + top-k không gate → dễ trả lời lệch miền. Chi tiết vấn đề + sơ đồ + P0–P3: [05-kb-vuot-demo.md](./05-kb-vuot-demo.md).
+
 ## 3. Mô hình quyền
 
 | Phòng ban | Tenant | Role mặc định | KB |
 |-----------|--------|---------------|-----|
-| Pháp chế | `Phòng Pháp chế` | Owner: lead; Viewer: nhân viên | Luật Đất đai + Policy |
+| Pháp chế | `Phòng Pháp chế` | Owner: lead; Viewer: nhân viên | Tách miền: `Luật Đất đai`, `Policy nội bộ đất đai` (không nhét HN-GĐ vào cùng KB đất đai) |
 | Team khác | Tenant riêng | Owner riêng | Không thấy KB Pháp chế |
+
+**Quy ước KB:** một KB ≈ một miền đọc; description ghi phạm vi + loại trừ. Workspace có nhiều KB là đúng — chọn sai KB mà vẫn trả lời là lỗi sản phẩm (xem [05](./05-kb-vuot-demo.md)).
 
 ## 4. Kiến trúc chọn
 
 - Stack: **Python / FastAPI / SQLAlchemy / PostgreSQL+pgvector**  
-- Model: fake (lab) hoặc OpenAI-compatible / Ollama  
+- Model: `fake` (offline) hoặc **Mistral** (chat + `mistral-embed-2312`) / Gemini / Ollama — xem [`../01-nen-tang/05-cau-hinh-mistral.md`](../01-nen-tang/05-cau-hinh-mistral.md)  
 - Ingest: sync mặc định; async qua Redis RQ (Phase 5)  
-- UI: API-only + Swagger (MVP)
+- UI: API + Swagger + UI tối thiểu `/ui` (M5.1; HTML/JS trong `web/`)
 
 ## 5. Map module → thư mục
 

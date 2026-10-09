@@ -16,11 +16,30 @@
 - [x] docker-compose (postgres, redis, api, worker)
 - [x] Blueprint domain Pháp chế / Luật Đất đai
 
-## Phase 6 — Domain Pháp chế (bước tiếp theo)
+## Phase 6 — Domain Pháp chế
 
-- [ ] Corpus trong `data/docs/` (lab `.md`; `.doc` convert trước khi upload)
-- [ ] `make demo-phap-che` pass — xem [04-demo-kich-ban.md](./04-demo-kich-ban.md)
-- [ ] Demo tay 2 câu hỏi Luật Đất đai có citation trên Swagger
+- [x] Corpus `data/docs/` (tóm tắt `.md` + `converted/*.txt` từ `.doc`)
+- [x] `make demo-phap-che` / ingest lab pass
+- [x] Chat domain có citation (Đ.171 đất ở, NĐ 88, thời hạn 50 năm)
+- [x] LLM thật: Mistral chat (`ministral-8b-2512`) + embed (`mistral-embed-2312`, dim 1024)
+- [ ] (Tuỳ chọn) So sánh Gemini `gemini-3.8-flash`
+- [x] M5.1 UI tối thiểu — `web/` tại http://127.0.0.1:8000/ui (xem [02-milestone.md](./02-milestone.md))
+- [x] M5.2 MCP server read-only — `POST /mcp` (JSON-RPC: `initialize`, `tools/list`, `tools/call` với `list_knowledge_bases` / `search_knowledge` / `answer_question`; phân quyền qua JWT + `X-Tenant-Id` hoặc API Key capability `kb.search` + kb_allowlist)
+- [ ] M5.3 Ragas / recall@k
+- [ ] M5.4 OIDC
+- [ ] M5.5 Đồng bộ Drive/Notion
+
+## M6 — KB vượt demo (enterprise)
+
+Thiết kế + sơ đồ: [05-kb-vuot-demo.md](./05-kb-vuot-demo.md)
+
+- [ ] M6.0 Relevance gate + refusal khi score thấp / lệch miền
+- [ ] M6.0 UI luôn hiện phạm vi KB đang hỏi
+- [ ] M6.1 Metadata `domain` / policy KB + document `effective_*`
+- [ ] M6.2 Search/chat `kb_ids[]` (multi-KB trong tenant + ACL)
+- [ ] M6.3 Bộ câu vàng: đất đai trên KB HN-GĐ → từ chối đúng
+
+Chi tiết chạy: [04-demo-kich-ban.md](./04-demo-kich-ban.md) · LLM: [05-cau-hinh-mistral.md](../01-nen-tang/05-cau-hinh-mistral.md)
 
 ## Tự kiểm nhanh
 

@@ -51,10 +51,21 @@ bash scripts/ingest_sample.sh data/docs/tom-tat-quy-dinh-su-dung-dat-lab.md
 
 ## Checklist “xong Phase 6 lab”
 
-- [ ] Chạy `make demo-phap-che` pass trên máy bạn  
-- [ ] Trả lời được ít nhất 2 câu hỏi domain có `citations[]`  
-- [ ] Ghi lại 1 câu hỏi mà model trả lời yếu → ghi chú cải thiện (chunk size, hybrid, LLM thật)  
+- [x] Chạy demo / ingest corpus pass trên máy lab  
+- [x] ≥ 2 câu hỏi domain có `citations[]` (đất ở / NĐ 88 / 50 năm)  
+- [x] LLM thật (Mistral chat + embed) — không còn phụ thuộc `fake` chat  
 - [ ] (Tuỳ chọn) Thêm 1 tenant thứ hai với KB khác để demo isolation rõ hơn  
+- [ ] (Tuỳ chọn) So sánh Gemini  
+- [x] M5.1 UI tối thiểu (`/ui`)  
+
+## Demo UI (M5.1)
+
+1. API chạy: `make run` (cổng 8000)  
+2. Mở http://127.0.0.1:8000/ui  
+3. Register → tạo/chọn tenant → tạo KB → upload 1 file trong `data/docs/`  
+4. Chat câu domain → xem citation; hoặc Agent (SSE)  
+
+Khi đổi `EMBEDDING_DIM`: `make db-reset` rồi ingest lại (mất data lab).
 
 ## Liên kết
 

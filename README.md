@@ -10,13 +10,13 @@ Học kiến trúc và xây **Agent AI doanh nghiệp có phân quyền**, lấy
 cp .env.example .env
 docker compose up -d postgres redis
 uv sync --all-extras
-uv run python -m app.bootstrap_db
+uv run python -m app.bootstrap_db   # đổi EMBEDDING_DIM → make db-reset
 uv run uvicorn app.main:app --reload --port 8000
 # smoke: make smoke-rag && make smoke-rbac
-# Phase 6 demo: make demo-phap-che
+# Phase 6: make demo-phap-che
 ```
 
-Chi tiết API: [`app/README.md`](./app/README.md) · Swagger: http://127.0.0.1:8000/docs
+Chi tiết API: [`app/README.md`](./app/README.md) · LLM Mistral/Gemini: [`docs/01-nen-tang/05-cau-hinh-mistral.md`](./docs/01-nen-tang/05-cau-hinh-mistral.md) · Swagger: http://127.0.0.1:8000/docs · UI: http://127.0.0.1:8000/ui
 
 ## Mục tiêu
 
@@ -47,8 +47,9 @@ Sau khi đi hết lộ trình, bạn có thể tự thiết kế và implement m
 2. **Handler → Service → Repository** — Handler không chứa business logic.  
 3. **Tenant là biên giới tài nguyên** — mọi KB, Agent, Session thuộc một workspace.  
 4. **Role + ownership** — role cho phép *loại hành động*; ownership/share quyết định *tài nguyên nào*.  
-5. **Agent-friendly errors** — lỗi có mã typed, hint hành động tiếp theo.  
-6. **Đừng auto-approve destructive** — thao tác xóa cần xác nhận tường minh.
+5. **KB ≠ túi file** — miền, quyền, relevance gate, lifecycle; xem [`docs/06-xay-du-an/05-kb-vuot-demo.md`](./docs/06-xay-du-an/05-kb-vuot-demo.md).  
+6. **Agent-friendly errors** — lỗi có mã typed, hint hành động tiếp theo.  
+7. **Đừng auto-approve destructive** — thao tác xóa cần xác nhận tường minh.
 
 ## Map nhanh sang WeKnora
 

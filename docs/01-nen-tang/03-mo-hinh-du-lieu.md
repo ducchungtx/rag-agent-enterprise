@@ -40,6 +40,7 @@ erDiagram
         uuid tenant_id FK
         uuid owner_user_id FK
         string name
+        string description
     }
     DOCUMENT {
         uuid id PK
@@ -80,6 +81,14 @@ erDiagram
 1. Mọi bảng tài nguyên nghiệp vụ (`knowledge_bases`, `documents`, `sessions`, `api_keys`) **có** `tenant_id`.  
 2. Mọi query list/get **filter** `tenant_id = context.tenant_id`.  
 3. ID resource (UUID) **không** đủ — luôn kèm check tenant (tránh IDOR).
+
+## KB trong schema MVP — giới hạn cần biết
+
+MVP: `KnowledgeBase` ≈ `name` + `description` + list `Document`. Đủ cho lab; **chưa** có domain, policy relevance, multi-KB, lifecycle văn bản.
+
+KB doanh nghiệp ≠ túi file. Vấn đề (chọn sai miền, top-k không gate) + sơ đồ + phương án P0–P3:
+
+→ [06-xay-du-an/05-kb-vuot-demo.md](../06-xay-du-an/05-kb-vuot-demo.md)
 
 ## Trạng thái parse (chuẩn bị Phase 2)
 
