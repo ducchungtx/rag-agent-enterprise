@@ -43,17 +43,31 @@ Corpus Luật Đất đai + demo RBAC/isolation; LLM Mistral (chat + embed 1024)
 
 **Demo M5.1:** mở `/ui` → register → tenant → KB + upload → Chat / Agent SSE.
 
-## M6 — KB enterprise (vượt demo) ⬜
+## M5.6 — UI Stitch → React ✅
+
+App: [`../../frontend/`](../../frontend/). Reference: [`../../ui/`](../../ui/). Lab cũ: `web/` (fallback).
+
+| Bước | Hạng mục | Trạng thái |
+|------|----------|------------|
+| M5.6a | Shell + Auth | ✅ |
+| M5.6b | Chat + Refusal UI | ✅ |
+| M5.6c | KB list + upload | ✅ |
+| M5.6d | Members + API Keys (list) | ✅ |
+
+**Dev:** `cd frontend && npm run dev` → http://127.0.0.1:5173/ui/  
+**Prod:** `npm run build` → FastAPI mount `frontend/dist` tại `/ui`.
+
+## M6 — KB enterprise (vượt demo)
 
 Thiết kế: [05-kb-vuot-demo.md](./05-kb-vuot-demo.md).
 
-| Bước | Hạng mục | Ưu tiên |
-|------|----------|---------|
-| M6.0 | Relevance gate + refusal + UI hiện phạm vi KB | P0 |
-| M6.1 | Metadata domain / policy KB + document hiệu lực | P1 |
-| M6.2 | Multi-KB (`kb_ids[]`) + citation có `kb_id` | P2 |
-| M6.3 | Router domain + eval lệch miền | P2–P3 |
+| Bước | Hạng mục | Trạng thái |
+|------|----------|------------|
+| M6.0 | Relevance gate + refusal + ScopeBar | ✅ `RETRIEVAL_MIN_SCORE` |
+| M6.1 | Metadata domain / policy KB + document hiệu lực | ⬜ |
+| M6.2 | Multi-KB (`kb_ids[]`) + citation có `kb_id` | ⬜ |
+| M6.3 | Router domain + eval lệch miền | ⬜ |
 
-**DoD M6.0:** hỏi đất đai trên KB HN-GĐ → từ chối / yêu cầu đổi KB, không bịa kèm citation lệch.
+**DoD M6.0:** hỏi đất đai trên KB lệch miền / score thấp → `refused=true` + RefusalBanner.
 
-Tag gợi ý: `m0`…`m4`, `m5.1`, `m6.0` khi bạn muốn đánh dấu git.
+Tag gợi ý: `m0`…`m4`, `m5.1`, `m5.6`, `m6.0` khi bạn muốn đánh dấu git.

@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -13,7 +14,9 @@ from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.request_id import RequestIdMiddleware
 from app.models.schemas import HealthOut
 
-WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+ROOT = Path(__file__).resolve().parent.parent
+FRONTEND_DIST = ROOT / "frontend" / "dist"
+WEB_DIR = ROOT / "web"
 
 
 @asynccontextmanager
@@ -39,6 +42,14 @@ def create_app() -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
+    origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins or ["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     application.add_middleware(RequestIdMiddleware)
     application.add_middleware(RateLimitMiddleware, limit=120, window=60.0)
     application.include_router(api_router)
@@ -51,10 +62,12 @@ def create_app() -> FastAPI:
     def ui_root() -> RedirectResponse:
         return RedirectResponse(url="/ui/")
 
-    if WEB_DIR.is_dir():
+    # Prefer React build; fall back to lab web/ if dist missing.
+    static_dir = FRONTEND_DIST if FRONTEND_DIST.is_dir() else WEB_DIR
+    if static_dir.is_dir():
         application.mount(
             "/ui",
-            StaticFiles(directory=str(WEB_DIR), html=True),
+            StaticFiles(directory=str(static_dir), html=True),
             name="ui",
         )
 

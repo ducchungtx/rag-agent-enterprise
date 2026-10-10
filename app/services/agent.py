@@ -50,7 +50,14 @@ def build_tools(db: Session, tenant_id: UUID, kb_id: UUID) -> ToolRegistry:
     reg = ToolRegistry()
 
     def search_knowledge(query: str, top_k: int = 5) -> list[dict]:
-        hits = search_chunks(db, tenant_id=tenant_id, kb_id=kb_id, query=query, top_k=top_k)
+        hits = search_chunks(
+            db,
+            tenant_id=tenant_id,
+            kb_id=kb_id,
+            query=query,
+            top_k=top_k,
+            apply_relevance_gate=True,
+        )
         return [h.model_dump(mode="json") for h in hits]
 
     def read_document(document_id: str) -> dict:
@@ -80,6 +87,26 @@ def run_agent_events(
     hits = tools.call("search_knowledge", query=question, top_k=5)
     yield AgentEvent("tool_result", {"tool": "search_knowledge", "result": hits})
 
+    if not hits:
+        reason = (
+            "Không đủ nguồn phù hợp trong Knowledge Base đang chọn để trả lời câu hỏi này."
+        )
+        suggest = (
+            "Hãy đổi sang KB đúng miền hoặc upload tài liệu liên quan rồi hỏi lại."
+        )
+        yield AgentEvent(
+            "done",
+            {
+                "answer": reason,
+                "citations": [],
+                "refused": True,
+                "refusal_reason": reason,
+                "suggested_message": suggest,
+                "provider": settings.chat_provider,
+            },
+        )
+        return
+
     doc_id = hits[0]["document_id"] if hits else None
     if doc_id and max_steps >= 2:
         yield AgentEvent("tool_start", {"tool": "read_document", "args": {"document_id": doc_id}})
@@ -88,11 +115,21 @@ def run_agent_events(
 
     contexts = [h["content"] for h in hits]
     answer = chat_completion(
-        "Bạn là agent doanh nghiệp. Dựa trên kết quả tool để trả lời.",
+        "Bạn là agent doanh nghiệp pháp chế. CHỈ dựa trên kết quả tool. "
+        "Không bịa khi thiếu nguồn.",
         question,
         contexts,
     )
     # Stream tokens (fake chunking)
     for i in range(0, len(answer), 24):
         yield AgentEvent("token", {"text": answer[i : i + 24]})
-    yield AgentEvent("done", {"answer": answer, "provider": settings.chat_provider})
+    yield AgentEvent(
+        "done",
+        {
+            "answer": answer,
+            "citations": hits,
+            "refused": False,
+            "provider": settings.chat_provider,
+        },
+    )
+

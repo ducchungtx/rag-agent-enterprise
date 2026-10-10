@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models.orm import Chunk, Document, ParseStatus
 from app.models.schemas import CitationOut
 from app.services.llm import embed_query
@@ -17,6 +18,7 @@ def search_chunks(
     kb_id: UUID,
     query: str,
     top_k: int = 5,
+    apply_relevance_gate: bool = False,
 ) -> list[CitationOut]:
     q_emb = embed_query(query)
     # Vector distance (cosine via <=> with normalized vectors ≈ L2 for unit vectors)
@@ -57,7 +59,24 @@ def search_chunks(
             )
         )
     scored.sort(key=lambda x: x[0], reverse=True)
-    return [c for _, c in scored[:top_k]]
+    hits = [c for _, c in scored[:top_k]]
+    if apply_relevance_gate:
+        return filter_by_min_score(hits)
+    return hits
+
+
+def filter_by_min_score(
+    hits: list[CitationOut],
+    min_score: float | None = None,
+) -> list[CitationOut]:
+    """M6.0: drop weak hits so chat/agent can refuse instead of hallucinating."""
+    threshold = settings.retrieval_min_score if min_score is None else min_score
+    if not hits:
+        return []
+    best = max(h.score for h in hits)
+    if best < threshold:
+        return []
+    return [h for h in hits if h.score >= threshold]
 
 
 def read_document_text(

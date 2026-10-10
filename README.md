@@ -14,9 +14,13 @@ uv run python -m app.bootstrap_db   # đổi EMBEDDING_DIM → make db-reset
 uv run uvicorn app.main:app --reload --port 8000
 # smoke: make smoke-rag && make smoke-rbac
 # Phase 6: make demo-phap-che
+
+# Frontend React (dev)
+cd frontend && npm install && npm run dev   # http://127.0.0.1:5173/ui/
+# Prod UI: cd frontend && npm run build → FastAPI serve dist tại /ui
 ```
 
-Chi tiết API: [`app/README.md`](./app/README.md) · LLM Mistral/Gemini: [`docs/01-nen-tang/05-cau-hinh-mistral.md`](./docs/01-nen-tang/05-cau-hinh-mistral.md) · Swagger: http://127.0.0.1:8000/docs · UI: http://127.0.0.1:8000/ui
+Chi tiết API: [`app/README.md`](./app/README.md) · FE: [`frontend/README.md`](./frontend/README.md) · LLM: [`docs/01-nen-tang/05-cau-hinh-mistral.md`](./docs/01-nen-tang/05-cau-hinh-mistral.md) · Swagger: http://127.0.0.1:8000/docs · UI: http://127.0.0.1:8000/ui
 
 ## Mục tiêu
 

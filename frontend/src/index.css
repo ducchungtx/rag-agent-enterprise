@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #005f54;
+  --color-primary-container: #0f7a6c;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #abffee;
+  --color-secondary: #26695e;
+  --color-secondary-container: #abecdf;
+  --color-on-secondary-container: #2c6d62;
+  --color-surface: #f6faff;
+  --color-surface-low: #ebf5ff;
+  --color-surface-container: #e1f0fe;
+  --color-surface-high: #dbeaf8;
+  --color-surface-highest: #d6e4f2;
+  --color-surface-lowest: #ffffff;
+  --color-on-surface: #0f1d27;
+  --color-on-surface-variant: #3e4946;
+  --color-outline: #6e7976;
+  --color-outline-variant: #bdc9c5;
+  --color-warn: #9a4b1a;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-tertiary: #893f0d;
+  --font-display: "Merriweather", Georgia, serif;
+  --font-body: "Source Sans 3", "Segoe UI", sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+  background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  vertical-align: middle;
+  user-select: none;
+}

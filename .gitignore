@@ -10,3 +10,6 @@ dist/
 build/
 .DS_Store
 uv.lock
+frontend/node_modules/
+# Keep frontend/dist optional locally; CI may rebuild — ignore to avoid binary noise
+frontend/dist/

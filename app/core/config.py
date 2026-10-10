@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     embedding_model: str = "nomic-embed-text"
     chat_model: str = "qwen2.5:7b"
+    # M6.0: từ chối chat nếu max citation score < ngưỡng (0–1, hybrid-lite)
+    retrieval_min_score: float = 0.22
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     def ensure_data_dir(self) -> Path:
         path = Path(self.data_dir)

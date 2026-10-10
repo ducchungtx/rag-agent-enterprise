@@ -121,6 +121,9 @@ class ChatIn(BaseModel):
 class ChatOut(BaseModel):
     answer: str
     citations: list[CitationOut]
+    refused: bool = False
+    refusal_reason: str | None = None
+    suggested_message: str | None = None
 
 
 class AgentChatIn(BaseModel):

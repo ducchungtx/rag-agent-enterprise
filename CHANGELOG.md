@@ -3,6 +3,10 @@
 ## Unreleased
 
 - Docs: `docs/06-xay-du-an/05-kb-vuot-demo.md` — KB vượt demo (sơ đồ lỗ hổng, cấu trúc KB DN, roadmap P0–P3 / M6); liên kết blueprint, milestone, checklist, schema.
+- Docs: `docs/06-xay-du-an/06-ui-brief-ai.md` — UI brief AI-ready (prompt gốc, IA, spec màn, tokens, states Refusal).
+- UI: unpack Stitch → `ui/screens/01`…`07`; `ui/README.md` bản đồ màn + sprint M5.6 / M6.0.
+- Frontend: `frontend/` React+Vite+TS+Tailwind — Auth, shell, Chat (SSE), Knowledge, Members, API Keys; CORS + Vite proxy; mount `dist` at `/ui`.
+- M6.0: `RETRIEVAL_MIN_SCORE` relevance gate; `ChatOut.refused` / agent `done.refused`; ScopeBar + RefusalBanner.
 
 ## 0.1.0 — MVP learning implementation
 
